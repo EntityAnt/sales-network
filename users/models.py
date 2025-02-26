@@ -45,12 +45,7 @@ class User(AbstractUser):
         verbose_name="ТГ-ник",
         help_text="Укажите телеграмм-ник"
     )
-    tg_chat_id = models.CharField(
-        max_length=50,
-        **NULLABLE,
-        verbose_name="Телеграмм chat-id",
-        help_text="Укажите телеграмм chat-id"
-    )
+
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
