@@ -46,7 +46,6 @@ class User(AbstractUser):
         help_text="Укажите телеграмм-ник"
     )
 
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

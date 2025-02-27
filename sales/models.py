@@ -1,15 +1,16 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 
+from config.settings import NULLABLE
 from users.models import User
 
 
 class Contacts(models.Model):
-    email = models.EmailField(verbose_name='Email')
-    country = models.CharField(max_length=100, verbose_name='Страна')
-    city = models.CharField(max_length=100, verbose_name='Город')
-    street = models.CharField(max_length=100, verbose_name='Улица')
-    house_number = models.CharField(max_length=10, verbose_name='Номер дома')
+    email = models.EmailField(verbose_name="Email")
+    country = models.CharField(max_length=100, verbose_name="Страна")
+    city = models.CharField(max_length=100, verbose_name="Город")
+    street = models.CharField(max_length=100, verbose_name="Улица")
+    house_number = models.CharField(max_length=10, verbose_name="Номер дома")
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -18,19 +19,18 @@ class Contacts(models.Model):
         help_text="Укажите создателя контакта",
     )
 
-
     def __str__(self):
         return self.email
 
     class Meta:
-        verbose_name = 'Контакт'
-        verbose_name_plural = 'Контакты'
+        verbose_name = "Контакт"
+        verbose_name_plural = "Контакты"
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Название')
-    model = models.CharField(max_length=100, verbose_name='Модель')
-    release_date = models.DateField(verbose_name='Дата выхода на рынок')
+    name = models.CharField(max_length=100, verbose_name="Название")
+    model = models.CharField(max_length=100, verbose_name="Модель")
+    release_date = models.DateField(verbose_name="Дата выхода на рынок")
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -43,56 +43,41 @@ class Product(models.Model):
         return f"{self.name} {self.model}"
 
     class Meta:
-        verbose_name = 'Продукт'
-        verbose_name_plural = 'Продукты'
+        verbose_name = "Продукт"
+        verbose_name_plural = "Продукты"
 
 
 class NetworkNode(models.Model):
-    FACTORY = 'factory'
-    RETAIL = 'retail'
-    ENTREPRENEUR = 'entrepreneur'
+    FACTORY = "factory"
+    RETAIL = "retail"
+    ENTREPRENEUR = "entrepreneur"
     NODE_TYPES = (
-        (FACTORY, 'Завод'),
-        (RETAIL, 'Розничная сеть'),
-        (ENTREPRENEUR, 'Индивидуальный предприниматель'),
+        (FACTORY, "Завод"),
+        (RETAIL, "Розничная сеть"),
+        (ENTREPRENEUR, "Индивидуальный предприниматель"),
     )
 
-    name = models.CharField(max_length=255, verbose_name='Название')
-    type = models.CharField(
-        max_length=20,
-        choices=NODE_TYPES,
-        verbose_name='Тип звена'
-    )
+    name = models.CharField(max_length=255, verbose_name="Название")
+    type = models.CharField(max_length=20, choices=NODE_TYPES, verbose_name="Тип звена")
     contacts = models.OneToOneField(
-        Contacts,
-        on_delete=models.CASCADE,
-        verbose_name='Контакты'
+        Contacts, **NULLABLE, on_delete=models.CASCADE, verbose_name="Контакты"
     )
-    products = models.ManyToManyField(
-        Product,
-        verbose_name='Продукты'
-    )
+    products = models.ManyToManyField(Product, verbose_name="Продукты")
     supplier = models.ForeignKey(
-        'self',
+        "self",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name='children',
-        verbose_name='Поставщик'
+        **NULLABLE,
+        related_name="children",
+        verbose_name="Поставщик",
     )
     debt = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0.00,
-        verbose_name='Задолженность'
+        max_digits=10, decimal_places=2, default=0.00, verbose_name="Задолженность"
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Время создания'
-    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
 
     user = models.ForeignKey(
         User,
+        **NULLABLE,
         on_delete=models.CASCADE,
         related_name="node_user",
         verbose_name="Создатель",
@@ -112,7 +97,9 @@ class NetworkNode(models.Model):
                 current = current.supplier
                 level += 1
                 if current is None:
-                    raise ValidationError("Цепочка поставщиков должна заканчиваться заводом.")
+                    raise ValidationError(
+                        "Цепочка поставщиков должна заканчиваться заводом."
+                    )
                 if level > 2:
                     raise ValidationError("Максимальный уровень иерархии — 2.")
 
@@ -130,5 +117,5 @@ class NetworkNode(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Звено сети'
-        verbose_name_plural = 'Звенья сети'
+        verbose_name = "Звено сети"
+        verbose_name_plural = "Звенья сети"

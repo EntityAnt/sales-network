@@ -17,6 +17,9 @@ flake8 = "^7.1.2"
 black = "^25.1.0"
 isort = "^6.0.0"
 pillow = "^11.1.0"
+djangorestframework-simplejwt = "^5.5.0"
+drf-yasg = "^1.21.9"
+drf-spectacular = "^0.28.0"
 
 
 [build-system]

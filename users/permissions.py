@@ -1,16 +1,9 @@
-from rest_framework.permissions import SAFE_METHODS, BasePermission
+from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 
 
-class IsOwnerOrReadOnly(BasePermission):
-    """Проверяет, является ли пользователь создателем."""
-
-    message = "Вы не являетесь создателем этой привычки!"
-
-    def has_object_permission(self, request, view, obj):
-        if obj.is_public:
-            return True
-        return obj.user == request.user
-
+class IsActiveUser(permissions.BasePermission):
     def has_permission(self, request, view):
-
-        return request.method in SAFE_METHODS or request.user.is_authenticated
+        if request.user and request.user.is_active:
+            return True
+        raise PermissionDenied("Ваш аккаунт неактивен. Обратитесь к администратору.")
